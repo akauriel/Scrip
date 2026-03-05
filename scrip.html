@@ -4,721 +4,665 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Prompt Builder</title>
+<title>AI Prompt Builder — Copilot</title>
 <style>
-  :root {
-    --bg: #0f1117;
-    --surface: #181c27;
-    --surface2: #1e2333;
-    --border: #2a3045;
-    --accent: #4f8ef7;
-    --accent2: #7c3aed;
-    --accent3: #10b981;
-    --warn: #f59e0b;
-    --text: #e2e8f0;
-    --text-dim: #8892a4;
-    --text-muted: #4a5568;
-    --mono: 'Cascadia Code', 'Consolas', 'Menlo', 'Monaco', 'Courier New', monospace;
-    --sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-- { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-background: var(–bg);
-color: var(–text);
-font-family: var(–sans);
+html, body {
+height: 100%;
+background-color: #0f1117;
+color: #e2e8f0;
+font-family: ‘Segoe UI’, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.6;
-min-height: 100vh;
 }
 
-.header {
-background: var(–surface);
-border-bottom: 1px solid var(–border);
-padding: 20px 32px;
+#hdr {
+background-color: #181c27;
+border-bottom: 1px solid #2a3045;
+padding: 14px 24px;
 display: flex;
 align-items: center;
-gap: 16px;
-position: sticky;
-top: 0;
-z-index: 100;
+gap: 14px;
 }
-
-.header-badge {
-background: linear-gradient(135deg, var(–accent), var(–accent2));
-color: white;
-font-family: var(–mono);
-font-size: 10px;
-font-weight: 600;
+#hdr-badge {
+background: linear-gradient(135deg, #4f8ef7, #7c3aed);
+color: #fff;
+font-family: Consolas, ‘Courier New’, monospace;
+font-size: 11px;
+font-weight: 700;
 padding: 4px 10px;
 border-radius: 4px;
-letter-spacing: 0.08em;
-text-transform: uppercase;
+letter-spacing: 1px;
+white-space: nowrap;
+}
+#hdr h1 { font-size: 16px; font-weight: 600; color: #e2e8f0; }
+#hdr-sub { font-size: 12px; color: #8892a4; margin-left: auto; white-space: nowrap; }
+
+#wrap {
+display: flex;
+flex-direction: row;
+height: calc(100vh - 53px);
+overflow: hidden;
 }
 
-.header h1 {
-font-size: 16px;
-font-weight: 600;
-letter-spacing: -0.01em;
-}
-
-.header p {
-font-size: 12px;
-color: var(–text-dim);
-margin-left: auto;
-}
-
-.layout {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 0;
-height: calc(100vh - 61px);
-}
-
-.panel {
+#col-left {
+width: 55%;
+min-width: 320px;
 overflow-y: auto;
-padding: 28px 32px;
+padding: 24px 28px;
+border-right: 1px solid #2a3045;
+background-color: #0f1117;
 }
 
-.panel-left {
-border-right: 1px solid var(–border);
+#col-right {
+width: 45%;
+overflow-y: auto;
+padding: 24px 28px;
+background-color: #181c27;
+display: flex;
+flex-direction: column;
 }
 
-.panel-right {
-background: var(–surface);
-}
+.sec { margin-bottom: 26px; }
 
-.section {
-margin-bottom: 28px;
-}
-
-.section-label {
-font-family: var(–mono);
+.sec-label {
+font-family: Consolas, ‘Courier New’, monospace;
 font-size: 10px;
-font-weight: 600;
+font-weight: 700;
 text-transform: uppercase;
-letter-spacing: 0.12em;
-color: var(–accent);
-margin-bottom: 10px;
+letter-spacing: 1.5px;
+color: #4f8ef7;
+margin-bottom: 6px;
 display: flex;
 align-items: center;
 gap: 8px;
+flex-wrap: wrap;
 }
-
-.section-label .tag {
-color: var(–text-muted);
-font-weight: 400;
-}
-
-.section-label .optional {
-color: var(–text-muted);
+.sec-label .xtag { color: #4a5568; font-weight: 400; }
+.sec-label .opt {
+color: #4a5568;
 font-size: 9px;
-background: var(–surface2);
-border: 1px solid var(–border);
-padding: 1px 6px;
+background-color: #1e2333;
+border: 1px solid #2a3045;
+padding: 1px 7px;
 border-radius: 3px;
-letter-spacing: 0.05em;
 }
+.sec-label .req { color: #ef4444; font-size: 10px; }
 
 .hint {
 font-size: 11px;
-color: var(–text-dim);
-margin-bottom: 8px;
+color: #8892a4;
+margin-bottom: 7px;
 font-style: italic;
 }
 
-input[type=“text”], textarea, select {
+input[type=“text”], textarea {
 width: 100%;
-background: var(–surface2);
-border: 1px solid var(–border);
+background-color: #1e2333;
+border: 1px solid #2a3045;
 border-radius: 6px;
-color: var(–text);
-font-family: var(–sans);
+color: #e2e8f0;
+font-family: ‘Segoe UI’, Arial, sans-serif;
 font-size: 13px;
-padding: 10px 14px;
-transition: border-color 0.15s;
+padding: 9px 13px;
 resize: vertical;
+display: block;
 }
-
-input[type=“text”]:focus, textarea:focus, select:focus {
+input[type=“text”]:focus, textarea:focus {
 outline: none;
-border-color: var(–accent);
-box-shadow: 0 0 0 2px rgba(79,142,247,0.12);
+border-color: #4f8ef7;
+box-shadow: 0 0 0 2px rgba(79,142,247,0.15);
 }
+textarea { min-height: 76px; }
 
-select option {
-background: var(–surface2);
-}
-
-textarea { min-height: 80px; }
-
-.chips {
-display: flex;
-flex-wrap: wrap;
-gap: 6px;
-margin-top: 6px;
-}
-
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
 .chip {
-background: var(–surface2);
-border: 1px solid var(–border);
+background-color: #1e2333;
+border: 1px solid #2a3045;
 border-radius: 20px;
 font-size: 12px;
-padding: 4px 12px;
+color: #8892a4;
+padding: 4px 13px;
 cursor: pointer;
-transition: all 0.15s;
-color: var(–text-dim);
 user-select: none;
 }
+.chip:hover { border-color: #4f8ef7; color: #4f8ef7; }
+.chip.on { background-color: #1a2d4f; border-color: #4f8ef7; color: #4f8ef7; }
+.chip.won.on { background-color: #2d2010; border-color: #f59e0b; color: #f59e0b; }
 
-.chip:hover { border-color: var(–accent); color: var(–accent); }
-.chip.active { background: rgba(79,142,247,0.15); border-color: var(–accent); color: var(–accent); }
-.chip.warn-chip { border-color: transparent; }
-.chip.warn-chip.active { background: rgba(245,158,11,0.15); border-color: var(–warn); color: var(–warn); }
-
-.toggle-row {
+.trow {
 display: flex;
 align-items: center;
 gap: 10px;
-padding: 10px 14px;
-background: var(–surface2);
-border: 1px solid var(–border);
+padding: 9px 13px;
+background-color: #1e2333;
+border: 1px solid #2a3045;
 border-radius: 6px;
+margin-bottom: 7px;
 cursor: pointer;
-transition: border-color 0.15s;
+}
+.trow:hover { border-color: #4f8ef7; }
+.trow input[type=“checkbox”] { width: 15px; height: 15px; accent-color: #4f8ef7; cursor: pointer; flex-shrink: 0; }
+.trow label { cursor: pointer; font-size: 13px; color: #e2e8f0; flex: 1; }
+.trow .thint { font-size: 11px; color: #4a5568; font-style: italic; white-space: nowrap; }
+
+.div { border: none; border-top: 1px solid #2a3045; margin: 4px 0 22px; }
+
+.ibox {
+background-color: #0d1a2e;
+border: 1px solid #1e3a5f;
+border-radius: 6px;
+padding: 11px 14px;
+font-size: 12px;
+color: #8892a4;
+margin-bottom: 24px;
+}
+.ibox strong { color: #4f8ef7; }
+
+.wbox {
+background-color: #1e1600;
+border: 1px solid #3d2e00;
+border-radius: 6px;
+padding: 11px 14px;
+font-size: 12px;
+color: #8892a4;
+margin-bottom: 12px;
+}
+.wbox strong { color: #f59e0b; }
+
+#stage-area { display: none; margin-top: 10px; }
+.stage-item {
+background-color: #0f1117;
+border: 1px solid #2a3045;
+border-radius: 6px;
+padding: 11px;
 margin-bottom: 8px;
 }
+.stage-num {
+font-family: Consolas, ‘Courier New’, monospace;
+font-size: 10px;
+color: #4f8ef7;
+font-weight: 700;
+margin-bottom: 6px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.rm-btn {
+background: none;
+border: none;
+color: #4a5568;
+font-size: 16px;
+cursor: pointer;
+padding: 0 4px;
+line-height: 1;
+}
+.rm-btn:hover { color: #ef4444; }
+.add-btn {
+width: 100%;
+background: none;
+border: 1px dashed #2a3045;
+border-radius: 6px;
+color: #4a5568;
+font-size: 12px;
+font-family: ‘Segoe UI’, Arial, sans-serif;
+padding: 8px;
+cursor: pointer;
+margin-top: 4px;
+}
+.add-btn:hover { border-color: #4f8ef7; color: #4f8ef7; }
 
-.toggle-row:hover { border-color: var(–accent); }
-.toggle-row input[type=“checkbox”] { accent-color: var(–accent); width: 15px; height: 15px; cursor: pointer; }
-.toggle-row label { cursor: pointer; font-size: 13px; flex: 1; }
-.toggle-row .toggle-hint { font-size: 11px; color: var(–text-muted); font-style: italic; }
-
-.output-header {
+#out-hdr {
 display: flex;
 align-items: center;
 justify-content: space-between;
-margin-bottom: 16px;
-padding-bottom: 14px;
-border-bottom: 1px solid var(–border);
+margin-bottom: 14px;
+padding-bottom: 13px;
+border-bottom: 1px solid #2a3045;
+flex-shrink: 0;
 }
-
-.output-title {
-font-family: var(–mono);
+#out-title {
+font-family: Consolas, ‘Courier New’, monospace;
 font-size: 11px;
-font-weight: 600;
+font-weight: 700;
 text-transform: uppercase;
-letter-spacing: 0.1em;
-color: var(–text-dim);
+letter-spacing: 1px;
+color: #8892a4;
 }
-
-.copy-btn {
-background: var(–accent);
-color: white;
+#copy-btn {
+background-color: #4f8ef7;
+color: #fff;
 border: none;
 border-radius: 6px;
-font-family: var(–sans);
+font-family: ‘Segoe UI’, Arial, sans-serif;
 font-size: 12px;
 font-weight: 600;
 padding: 7px 18px;
 cursor: pointer;
-transition: all 0.15s;
-letter-spacing: 0.02em;
+letter-spacing: 0.3px;
+flex-shrink: 0;
 }
+#copy-btn:hover { background-color: #6fa3f9; }
+#copy-btn.ok { background-color: #10b981; }
 
-.copy-btn:hover { background: #6fa3f9; transform: translateY(-1px); }
-.copy-btn:active { transform: translateY(0); }
-.copy-btn.copied { background: var(–accent3); }
-
-.xml-output {
-background: var(–bg);
-border: 1px solid var(–border);
+#xml-box {
+background-color: #0a0d13;
+border: 1px solid #2a3045;
 border-radius: 8px;
-padding: 20px;
-font-family: var(–mono);
+padding: 18px;
+font-family: Consolas, ‘Courier New’, monospace;
 font-size: 12px;
-line-height: 1.8;
+line-height: 1.85;
 white-space: pre-wrap;
 word-break: break-word;
 color: #c9d1d9;
-min-height: 300px;
-overflow-x: auto;
+flex: 1;
+overflow-y: auto;
+min-height: 200px;
 }
-
-.xml-tag { color: #79b8ff; }
-.xml-attr { color: #ffab70; }
-.xml-val { color: var(–text-dim); font-style: italic; }
-.xml-comment { color: #4a5568; }
-
-.tip-box {
-background: rgba(79,142,247,0.07);
-border: 1px solid rgba(79,142,247,0.25);
-border-radius: 6px;
-padding: 12px 14px;
-font-size: 12px;
-color: var(–text-dim);
-margin-bottom: 28px;
-}
-
-.tip-box strong { color: var(–accent); font-weight: 600; }
-
-.warn-box {
-background: rgba(245,158,11,0.07);
-border: 1px solid rgba(245,158,11,0.25);
-border-radius: 6px;
-padding: 12px 14px;
-font-size: 12px;
-color: var(–text-dim);
-margin-bottom: 16px;
-}
-
-.warn-box strong { color: var(–warn); }
-
-.stage-config {
-display: none;
-margin-top: 10px;
-}
-
-.stage-config.visible { display: block; }
-
-.stage-item {
-background: var(–bg);
-border: 1px solid var(–border);
-border-radius: 6px;
-padding: 12px;
-margin-bottom: 8px;
-}
-
-.stage-num {
-font-family: var(–mono);
-font-size: 10px;
-color: var(–accent);
-font-weight: 600;
-margin-bottom: 6px;
-}
-
-.add-stage-btn {
-background: transparent;
-border: 1px dashed var(–border);
-border-radius: 6px;
-color: var(–text-muted);
-font-size: 12px;
-padding: 8px;
-width: 100%;
-cursor: pointer;
-transition: all 0.15s;
-font-family: var(–sans);
-}
-
-.add-stage-btn:hover { border-color: var(–accent); color: var(–accent); }
-
-.remove-btn {
-background: transparent;
-border: none;
-color: var(–text-muted);
-cursor: pointer;
-font-size: 16px;
-float: right;
-line-height: 1;
-padding: 0 4px;
-transition: color 0.15s;
-}
-
-.remove-btn:hover { color: #ef4444; }
-
-.char-count {
-font-size: 10px;
-color: var(–text-muted);
-text-align: right;
-margin-top: 3px;
-font-family: var(–mono);
-}
-
-.divider {
-border: none;
-border-top: 1px solid var(–border);
-margin: 6px 0 22px;
-}
-
-@media (max-width: 900px) {
-.layout { grid-template-columns: 1fr; height: auto; }
-.panel-left { border-right: none; border-bottom: 1px solid var(–border); }
-}
+.xt { color: #79b8ff; }
+.xa { color: #ffab70; }
+.xc { color: #4a5568; }
 </style>
 
 </head>
 <body>
 
-<div class="header">
-  <div class="header-badge">&lt;XML&gt;</div>
+<div id="hdr">
+  <div id="hdr-badge">&lt;XML&gt;</div>
   <h1>AI Prompt Builder</h1>
-  <p>For Microsoft Copilot · No coding required</p>
+  <div id="hdr-sub">For Microsoft Copilot &nbsp;&middot;&nbsp; No coding required</div>
 </div>
 
-<div class="layout">
-  <!-- LEFT: FORM -->
-  <div class="panel panel-left">
+<div id="wrap">
+
+  <div id="col-left">
 
 ```
-<div class="tip-box">
-  <strong>How to use:</strong> Fill in the fields below. Your formatted XML prompt appears on the right — copy it and paste directly into Copilot. Only fill what's relevant; unused fields are omitted automatically.
+<div class="ibox">
+  <strong>How to use:</strong> Fill in the fields below. Your formatted XML prompt builds live on the right &mdash; copy it and paste directly into Copilot. Only fill what&rsquo;s relevant; unused fields are omitted automatically.
 </div>
 
-<!-- ROLE -->
-<div class="section">
-  <div class="section-label">1. Role / Persona <span class="tag">&lt;role&gt;</span></div>
+<!-- 1. ROLE -->
+<div class="sec">
+  <div class="sec-label">1. Role / Persona <span class="xtag">&lt;role&gt;</span></div>
   <div class="hint">Who should the AI act as? A specific expert helps ground the response.</div>
-  <input type="text" id="role" placeholder="e.g. experienced HR policy writer, senior data analyst, plain-English editor…" oninput="update()">
-  <div class="chips" style="margin-top:8px">
-    <span class="chip" onclick="setChip('role', this, 'Senior policy writer for a government agency')">Policy writer</span>
-    <span class="chip" onclick="setChip('role', this, 'Plain-English editor for non-technical audiences')">Plain-English editor</span>
-    <span class="chip" onclick="setChip('role', this, 'Project manager summarizing for leadership')">PM summarizer</span>
-    <span class="chip" onclick="setChip('role', this, 'Training facilitator creating learning materials')">Training facilitator</span>
-    <span class="chip" onclick="setChip('role', this, 'Communications specialist drafting stakeholder updates')">Comms specialist</span>
+  <input type="text" id="f-role" placeholder="e.g. experienced HR policy writer, plain-English editor, senior analyst&hellip;" oninput="build()">
+  <div class="chips" id="chips-role">
+    <span class="chip" onclick="pickChip('f-role','chips-role',this,'Senior policy writer for a government agency')">Policy writer</span>
+    <span class="chip" onclick="pickChip('f-role','chips-role',this,'Plain-English editor for non-technical audiences')">Plain-English editor</span>
+    <span class="chip" onclick="pickChip('f-role','chips-role',this,'Project manager summarizing for leadership')">PM summarizer</span>
+    <span class="chip" onclick="pickChip('f-role','chips-role',this,'Training facilitator creating learning materials')">Training facilitator</span>
+    <span class="chip" onclick="pickChip('f-role','chips-role',this,'Communications specialist drafting stakeholder updates')">Comms specialist</span>
   </div>
 </div>
+<hr class="div">
 
-<hr class="divider">
-
-<!-- TASK -->
-<div class="section">
-  <div class="section-label">2. Task <span class="tag">&lt;task&gt;</span> <em style="color:#ef4444;font-size:10px">required</em></div>
+<!-- 2. TASK -->
+<div class="sec">
+  <div class="sec-label">2. Task <span class="xtag">&lt;task&gt;</span> <span class="req">&#9733; Required</span></div>
   <div class="hint">What exactly do you want the AI to produce? Be specific about the action.</div>
-  <textarea id="task" placeholder="e.g. Write a one-page summary of the attached policy document. Identify the 3 most important changes from the previous version and explain each in plain English." oninput="update()"></textarea>
+  <textarea id="f-task" placeholder="e.g. Write a one-page summary of the attached policy document. Identify the 3 most important changes from the previous version and explain each in plain English." oninput="build()"></textarea>
 </div>
+<hr class="div">
 
-<hr class="divider">
-
-<!-- TONE -->
-<div class="section">
-  <div class="section-label">3. Tone <span class="tag">&lt;tone&gt;</span> <span class="optional">optional</span></div>
-  <div class="hint">How should the writing sound?</div>
+<!-- 3. TONE -->
+<div class="sec">
+  <div class="sec-label">3. Tone <span class="xtag">&lt;tone&gt;</span> <span class="opt">optional</span></div>
+  <div class="hint">How should the writing sound? Select all that apply.</div>
   <div class="chips">
-    <span class="chip" onclick="toggleChip('tone', this, 'Professional and formal')">Professional</span>
-    <span class="chip" onclick="toggleChip('tone', this, 'Conversational and approachable')">Conversational</span>
-    <span class="chip" onclick="toggleChip('tone', this, 'Direct and concise')">Direct</span>
-    <span class="chip" onclick="toggleChip('tone', this, 'Plain English — avoid jargon')">Plain English</span>
-    <span class="chip" onclick="toggleChip('tone', this, 'Empathetic and supportive')">Empathetic</span>
-    <span class="chip" onclick="toggleChip('tone', this, 'Persuasive and confident')">Persuasive</span>
-    <span class="chip" onclick="toggleChip('tone', this, 'Instructional and step-by-step')">Instructional</span>
-    <span class="chip" onclick="toggleChip('tone', this, 'Neutral and factual')">Neutral/Factual</span>
+    <span class="chip" onclick="toggleChip(this,'tone','Professional and formal')">Professional</span>
+    <span class="chip" onclick="toggleChip(this,'tone','Conversational and approachable')">Conversational</span>
+    <span class="chip" onclick="toggleChip(this,'tone','Direct and concise')">Direct</span>
+    <span class="chip" onclick="toggleChip(this,'tone','Plain English - avoid jargon')">Plain English</span>
+    <span class="chip" onclick="toggleChip(this,'tone','Empathetic and supportive')">Empathetic</span>
+    <span class="chip" onclick="toggleChip(this,'tone','Persuasive and confident')">Persuasive</span>
+    <span class="chip" onclick="toggleChip(this,'tone','Instructional and step-by-step')">Instructional</span>
+    <span class="chip" onclick="toggleChip(this,'tone','Neutral and factual')">Neutral/Factual</span>
   </div>
-  <input type="text" id="tone-custom" placeholder="Or type a custom tone…" style="margin-top:10px" oninput="update()">
+  <input type="text" id="f-tone-custom" placeholder="Or type a custom tone&hellip;" style="margin-top:9px" oninput="build()">
 </div>
+<hr class="div">
 
-<hr class="divider">
-
-<!-- AUDIENCE -->
-<div class="section">
-  <div class="section-label">4. Audience <span class="tag">&lt;audience&gt;</span> <span class="optional">optional</span></div>
+<!-- 4. AUDIENCE -->
+<div class="sec">
+  <div class="sec-label">4. Audience <span class="xtag">&lt;audience&gt;</span> <span class="opt">optional</span></div>
   <div class="hint">Who will read this output? Helps the AI calibrate detail and vocabulary.</div>
-  <input type="text" id="audience" placeholder="e.g. Non-technical staff, senior executives, new employees, external stakeholders…" oninput="update()">
+  <input type="text" id="f-audience" placeholder="e.g. Non-technical staff, senior executives, new employees, external stakeholders&hellip;" oninput="build()">
 </div>
+<hr class="div">
 
-<hr class="divider">
-
-<!-- CONTEXT / BACKGROUND -->
-<div class="section">
-  <div class="section-label">5. Background / Context <span class="tag">&lt;context&gt;</span> <span class="optional">optional</span></div>
-  <div class="hint">Any background the AI needs to understand the situation. Paste relevant text here if you can't attach a file.</div>
-  <textarea id="context" rows="4" placeholder="e.g. We are rolling out a new hybrid work policy in Q3. Staff have raised concerns about fairness. This summary will go to team leads before the all-hands meeting…" oninput="update()"></textarea>
+<!-- 5. CONTEXT -->
+<div class="sec">
+  <div class="sec-label">5. Background / Context <span class="xtag">&lt;context&gt;</span> <span class="opt">optional</span></div>
+  <div class="hint">Any background the AI needs. Paste relevant text here if you can&rsquo;t attach a file.</div>
+  <textarea id="f-context" rows="4" placeholder="e.g. We are rolling out a new hybrid work policy in Q3. Staff have raised concerns about fairness. This summary will go to team leads before the all-hands meeting&hellip;" oninput="build()"></textarea>
 </div>
+<hr class="div">
 
-<hr class="divider">
-
-<!-- FORMAT -->
-<div class="section">
-  <div class="section-label">6. Output Format <span class="tag">&lt;format&gt;</span> <span class="optional">optional</span></div>
+<!-- 6. FORMAT -->
+<div class="sec">
+  <div class="sec-label">6. Output Format <span class="xtag">&lt;output_format&gt;</span> <span class="opt">optional</span></div>
   <div class="hint">What should the output look like?</div>
   <div class="chips">
-    <span class="chip" onclick="toggleChip('format', this, 'Bullet points')">Bullet points</span>
-    <span class="chip" onclick="toggleChip('format', this, 'Numbered list')">Numbered list</span>
-    <span class="chip" onclick="toggleChip('format', this, 'Short paragraphs')">Short paragraphs</span>
-    <span class="chip" onclick="toggleChip('format', this, 'Table')">Table</span>
-    <span class="chip" onclick="toggleChip('format', this, 'Executive summary (max 1 page)')">Exec summary</span>
-    <span class="chip" onclick="toggleChip('format', this, 'Email format with subject line')">Email</span>
-    <span class="chip" onclick="toggleChip('format', this, 'FAQ format (question + answer pairs)')">FAQ</span>
-    <span class="chip" onclick="toggleChip('format', this, 'Step-by-step instructions')">Step-by-step</span>
+    <span class="chip" onclick="toggleChip(this,'format','Bullet points')">Bullet points</span>
+    <span class="chip" onclick="toggleChip(this,'format','Numbered list')">Numbered list</span>
+    <span class="chip" onclick="toggleChip(this,'format','Short paragraphs')">Short paragraphs</span>
+    <span class="chip" onclick="toggleChip(this,'format','Table')">Table</span>
+    <span class="chip" onclick="toggleChip(this,'format','Executive summary (max 1 page)')">Exec summary</span>
+    <span class="chip" onclick="toggleChip(this,'format','Email format with subject line')">Email</span>
+    <span class="chip" onclick="toggleChip(this,'format','FAQ format (question and answer pairs)')">FAQ</span>
+    <span class="chip" onclick="toggleChip(this,'format','Step-by-step instructions')">Step-by-step</span>
   </div>
-  <input type="text" id="format-custom" placeholder="Or describe a custom format…" style="margin-top:10px" oninput="update()">
+  <input type="text" id="f-format-custom" placeholder="Or describe a custom format&hellip;" style="margin-top:9px" oninput="build()">
 </div>
+<hr class="div">
 
-<hr class="divider">
-
-<!-- LENGTH CONSTRAINT -->
-<div class="section">
-  <div class="section-label">7. Length / Size Constraint <span class="tag">&lt;constraints&gt;</span> <span class="optional">optional</span></div>
-  <div class="warn-box"><strong>⚠ Copilot tip:</strong> If Copilot cuts off long outputs, use the staging option below to split your task into chunks — or set a short limit here and ask it to continue.</div>
+<!-- 7. LENGTH -->
+<div class="sec">
+  <div class="sec-label">7. Length Constraint <span class="xtag">&lt;constraints&gt;</span> <span class="opt">optional</span></div>
+  <div class="wbox"><strong>Copilot tip:</strong> If responses get cut off, use the staging option below to split your task into chunks &mdash; or set a short limit here and ask Copilot to continue.</div>
   <div class="chips">
-    <span class="chip warn-chip" onclick="toggleChip('length', this, 'Keep the response under 200 words')">Under 200 words</span>
-    <span class="chip warn-chip" onclick="toggleChip('length', this, 'Keep the response under 500 words')">Under 500 words</span>
-    <span class="chip warn-chip" onclick="toggleChip('length', this, 'One paragraph only')">One paragraph</span>
-    <span class="chip warn-chip" onclick="toggleChip('length', this, 'Max 5 bullet points')">Max 5 bullets</span>
-    <span class="chip warn-chip" onclick="toggleChip('length', this, 'No limit — complete the full task')">No limit</span>
+    <span class="chip won" onclick="toggleChip(this,'length','Keep the response under 200 words')">Under 200 words</span>
+    <span class="chip won" onclick="toggleChip(this,'length','Keep the response under 500 words')">Under 500 words</span>
+    <span class="chip won" onclick="toggleChip(this,'length','One paragraph only')">One paragraph</span>
+    <span class="chip won" onclick="toggleChip(this,'length','Max 5 bullet points')">Max 5 bullets</span>
+    <span class="chip won" onclick="toggleChip(this,'length','No limit - complete the full task')">No limit</span>
   </div>
-  <input type="text" id="length-custom" placeholder="Or specify your own limit…" style="margin-top:10px" oninput="update()">
+  <input type="text" id="f-length-custom" placeholder="Or specify your own limit&hellip;" style="margin-top:9px" oninput="build()">
 </div>
+<hr class="div">
 
-<hr class="divider">
-
-<!-- STAGING -->
-<div class="section">
-  <div class="section-label">8. Stage Output <span class="tag">&lt;stages&gt;</span> <span class="optional">optional — for long tasks</span></div>
-  <div class="hint">Break a big task into steps Copilot delivers one at a time. Useful when file output is disabled or responses get cut off.</div>
-  <div class="toggle-row">
+<!-- 8. STAGES -->
+<div class="sec">
+  <div class="sec-label">8. Stage Output <span class="xtag">&lt;stages&gt;</span> <span class="opt">optional &mdash; for long tasks</span></div>
+  <div class="hint">Break a big task into steps Copilot delivers one at a time. Useful when file creation is disabled or responses get cut off.</div>
+  <div class="trow">
     <input type="checkbox" id="use-stages" onchange="toggleStages()">
     <label for="use-stages">Split this task into stages</label>
-    <span class="toggle-hint">AI will pause and wait between each stage</span>
+    <span class="thint">AI pauses and waits between stages</span>
   </div>
-  <div id="stage-config" class="stage-config">
+  <div id="stage-area">
     <div id="stage-list"></div>
-    <button class="add-stage-btn" onclick="addStage()">+ Add a stage</button>
+    <button class="add-btn" onclick="addStage()">+ Add a stage</button>
   </div>
 </div>
+<hr class="div">
 
-<hr class="divider">
-
-<!-- RULES -->
-<div class="section">
-  <div class="section-label">9. Rules / Guardrails <span class="tag">&lt;rules&gt;</span> <span class="optional">optional</span></div>
-  <div class="hint">Things the AI must always do — or never do.</div>
-  <div class="toggle-row">
-    <input type="checkbox" id="r1" onchange="update()">
-    <label for="r1">Do not make up information — only use what is provided</label>
-  </div>
-  <div class="toggle-row">
-    <input type="checkbox" id="r2" onchange="update()">
-    <label for="r2">Do not include personal opinions or commentary</label>
-  </div>
-  <div class="toggle-row">
-    <input type="checkbox" id="r3" onchange="update()">
-    <label for="r3">Flag anything uncertain with "[Needs verification]"</label>
-  </div>
-  <div class="toggle-row">
-    <input type="checkbox" id="r4" onchange="update()">
-    <label for="r4">Avoid jargon and acronyms unless defined</label>
-  </div>
-  <div class="toggle-row">
-    <input type="checkbox" id="r5" onchange="update()">
-    <label for="r5">Do not reproduce large sections of source text verbatim</label>
-  </div>
-  <div class="toggle-row">
-    <input type="checkbox" id="r6" onchange="update()">
-    <label for="r6">Ask me a clarifying question before starting if anything is unclear</label>
-  </div>
-  <textarea id="rules-custom" placeholder="Add your own rules here (one per line)…" rows="3" style="margin-top:8px" oninput="update()"></textarea>
+<!-- 9. RULES -->
+<div class="sec">
+  <div class="sec-label">9. Rules / Guardrails <span class="xtag">&lt;rules&gt;</span> <span class="opt">optional</span></div>
+  <div class="hint">Things the AI must always do &mdash; or never do.</div>
+  <div class="trow"><input type="checkbox" id="r1" onchange="build()"><label for="r1">Do not make up information &mdash; only use what is provided</label></div>
+  <div class="trow"><input type="checkbox" id="r2" onchange="build()"><label for="r2">Do not include personal opinions or commentary</label></div>
+  <div class="trow"><input type="checkbox" id="r3" onchange="build()"><label for="r3">Flag anything uncertain with "[Needs verification]"</label></div>
+  <div class="trow"><input type="checkbox" id="r4" onchange="build()"><label for="r4">Avoid jargon and acronyms unless defined</label></div>
+  <div class="trow"><input type="checkbox" id="r5" onchange="build()"><label for="r5">Do not reproduce large sections of source text verbatim</label></div>
+  <div class="trow"><input type="checkbox" id="r6" onchange="build()"><label for="r6">Ask me a clarifying question before starting if anything is unclear</label></div>
+  <textarea id="f-rules-custom" placeholder="Add your own rules here (one per line)&hellip;" rows="3" style="margin-top:8px" oninput="build()"></textarea>
 </div>
+<hr class="div">
 
-<hr class="divider">
-
-<!-- REFERENCE MATERIAL -->
-<div class="section">
-  <div class="section-label">10. Reference Material <span class="tag">&lt;reference&gt;</span> <span class="optional">optional</span></div>
-  <div class="hint">Paste key text, data, or examples directly. If Copilot allows file attachments, note that here instead.</div>
-  <textarea id="reference" rows="5" placeholder="Paste reference text here — or write 'See attached file: [filename]' if attaching a document…" oninput="update()"></textarea>
+<!-- 10. REFERENCE -->
+<div class="sec">
+  <div class="sec-label">10. Reference Material <span class="xtag">&lt;reference&gt;</span> <span class="opt">optional</span></div>
+  <div class="hint">Paste key text or data directly. If Copilot allows file attachments, note that here instead.</div>
+  <textarea id="f-reference" rows="5" placeholder="Paste reference text here &mdash; or write 'See attached file: [filename]' if attaching a document&hellip;" oninput="build()"></textarea>
 </div>
 ```
 
   </div>
 
-  <!-- RIGHT: OUTPUT -->
+  <!-- RIGHT: XML OUTPUT -->
 
-  <div class="panel panel-right">
-    <div class="output-header">
-      <span class="output-title">📋 Your XML Prompt</span>
-      <button class="copy-btn" id="copy-btn" onclick="copyOutput()">Copy to Clipboard</button>
+  <div id="col-right">
+    <div id="out-hdr">
+      <span id="out-title">Your XML Prompt</span>
+      <button id="copy-btn" onclick="doCopy()">Copy to Clipboard</button>
     </div>
-    <div class="tip-box" style="margin-bottom:16px; font-size:11px">
-      <strong>Paste this directly into Copilot.</strong> The XML tags help the AI understand each piece of your request clearly. You don't need to explain the tags — Copilot reads them automatically.
+    <div class="ibox" style="font-size:11px; flex-shrink:0; margin-bottom:16px">
+      <strong>Paste this directly into Copilot.</strong> The XML tags help the AI understand each piece of your request. You don&rsquo;t need to explain the tags &mdash; Copilot reads them automatically.
     </div>
-    <div class="xml-output" id="xml-output"></div>
+    <div id="xml-box"></div>
   </div>
+
 </div>
 
 <script>
-  const toneSet = new Set();
-  const formatSet = new Set();
-  const lengthSet = new Set();
-  let stageCount = 0;
-  let stages = [];
+var sets = { tone: {}, format: {}, length: {} };
+var stages = [], stageId = 0;
 
-  function setChip(field, el, val) {
-    document.getElementById(field).value = val;
-    el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    update();
+function pickChip(fieldId, chipsId, el, val) {
+  document.getElementById(fieldId).value = val;
+  var chips = document.getElementById(chipsId).getElementsByClassName('chip');
+  for (var i = 0; i < chips.length; i++) chips[i].classList.remove('on');
+  el.classList.add('on');
+  build();
+}
+
+function toggleChip(el, group, val) {
+  if (sets[group][val]) {
+    delete sets[group][val];
+    el.classList.remove('on');
+  } else {
+    sets[group][val] = true;
+    el.classList.add('on');
   }
+  build();
+}
 
-  function toggleChip(field, el, val) {
-    const map = { tone: toneSet, format: formatSet, length: lengthSet };
-    const set = map[field];
-    if (!set) return;
-    if (set.has(val)) { set.delete(val); el.classList.remove('active'); }
-    else { set.add(val); el.classList.add('active'); }
-    update();
-  }
+function toggleStages() {
+  var on = document.getElementById('use-stages').checked;
+  document.getElementById('stage-area').style.display = on ? 'block' : 'none';
+  if (on && stages.length === 0) addStage();
+  build();
+}
 
-  function toggleStages() {
-    const on = document.getElementById('use-stages').checked;
-    document.getElementById('stage-config').classList.toggle('visible', on);
-    if (on && stages.length === 0) addStage();
-    update();
-  }
+function addStage() {
+  stageId++;
+  stages.push({ id: stageId, text: '' });
+  renderStages();
+}
 
-  function addStage() {
-    stageCount++;
-    const id = stageCount;
-    stages.push({ id, text: '' });
-    renderStages();
-  }
-
-  function removeStage(id) {
-    stages = stages.filter(s => s.id !== id);
-    renderStages();
-    update();
-  }
-
-  function renderStages() {
-    const el = document.getElementById('stage-list');
-    el.innerHTML = '';
-    stages.forEach((s, i) => {
-      const div = document.createElement('div');
-      div.className = 'stage-item';
-      div.innerHTML = `
-        <div class="stage-num">STAGE ${i + 1} <button class="remove-btn" onclick="removeStage(${s.id})">×</button></div>
-        <textarea placeholder="Describe what the AI should produce in this stage… e.g. First, provide a 3-sentence summary of the main topic only." 
-          rows="2" oninput="stageInput(${s.id}, this.value)">${s.text}</textarea>
-
-```
-  `;
-  el.appendChild(div);
-});
-update();
-```
-
+function removeStage(id) {
+  stages = stages.filter(function(s) { return s.id !== id; });
+  renderStages();
+  build();
 }
 
 function stageInput(id, val) {
-const s = stages.find(s => s.id === id);
-if (s) s.text = val;
-update();
+  for (var i = 0; i < stages.length; i++) {
+    if (stages[i].id === id) { stages[i].text = val; break; }
+  }
+  build();
 }
 
-function esc(str) {
-return str.replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’);
-}
-
-function buildXML() {
-const role = document.getElementById(‘role’).value.trim();
-const task = document.getElementById(‘task’).value.trim();
-const toneCustom = document.getElementById(‘tone-custom’).value.trim();
-const audience = document.getElementById(‘audience’).value.trim();
-const context = document.getElementById(‘context’).value.trim();
-const formatCustom = document.getElementById(‘format-custom’).value.trim();
-const lengthCustom = document.getElementById(‘length-custom’).value.trim();
-const reference = document.getElementById(‘reference’).value.trim();
-const rulesCustom = document.getElementById(‘rules-custom’).value.trim();
-const useStages = document.getElementById(‘use-stages’).checked;
+function renderStages() {
+  var el = document.getElementById('stage-list');
+  el.innerHTML = '';
+  for (var i = 0; i < stages.length; i++) {
+    var s = stages[i];
+    var d = document.createElement('div');
+    d.className = 'stage-item';
+    d.innerHTML = '<div class="stage-num">STAGE ' + (i+1) +
+      '<button class="rm-btn" onclick="removeStage(' + s.id + ')">&times;</button></div>' +
+      '<textarea placeholder="What should the AI produce in this stage?" rows="2" oninput="stageInput(' + s.id + ', this.value)">' + xe(s.text) + '</textarea>';
 
 ```
-const toneArr = [...toneSet];
-if (toneCustom) toneArr.push(toneCustom);
-const formatArr = [...formatSet];
-if (formatCustom) formatArr.push(formatCustom);
-const lengthArr = [...lengthSet];
-if (lengthCustom) lengthArr.push(lengthCustom);
+el.appendChild(d);
+```
 
-const rules = [];
-if (document.getElementById('r1').checked) rules.push('Do not make up information — only use what is provided.');
-if (document.getElementById('r2').checked) rules.push('Do not include personal opinions or commentary.');
-if (document.getElementById('r3').checked) rules.push('Flag anything uncertain with "[Needs verification]".');
-if (document.getElementById('r4').checked) rules.push('Avoid jargon and acronyms unless defined.');
-if (document.getElementById('r5').checked) rules.push('Do not reproduce large sections of source text verbatim.');
-if (document.getElementById('r6').checked) rules.push('Ask me a clarifying question before starting if anything is unclear.');
-if (rulesCustom) rulesCustom.split('\n').filter(r => r.trim()).forEach(r => rules.push(r.trim()));
-
-if (!task) return '<!-- Fill in at least the Task field (field 2) to generate your prompt. -->';
-
-let lines = ['<prompt>'];
-
-if (role) { lines.push(`\n  <role>`); lines.push(`    ${esc(role)}`); lines.push(`  </role>`); }
-
-lines.push(`\n  <task>`);
-lines.push(`    ${esc(task)}`);
-lines.push(`  </task>`);
-
-if (toneArr.length) {
-  lines.push(`\n  <tone>`);
-  toneArr.forEach(t => lines.push(`    - ${esc(t)}`));
-  lines.push(`  </tone>`);
+}
+build();
 }
 
-if (audience) { lines.push(`\n  <audience>`); lines.push(`    ${esc(audience)}`); lines.push(`  </audience>`); }
+function xe(s) {
+return s.replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’);
+}
 
-if (context) { lines.push(`\n  <context>`); context.split('\n').forEach(l => lines.push(`    ${esc(l)}`)); lines.push(`  </context>`); }
+function gv(id) {
+var el = document.getElementById(id);
+return el ? el.value.trim() : ‘’;
+}
 
-const allFormat = [...formatArr];
-const allLength = [...lengthArr];
-if (allFormat.length || allLength.length) {
-  lines.push(`\n  <output_format>`);
-  allFormat.forEach(f => lines.push(`    - ${esc(f)}`));
-  allLength.forEach(l => lines.push(`    - ${esc(l)}`));
-  lines.push(`  </output_format>`);
+function gc(id) {
+var el = document.getElementById(id);
+return el ? el.checked : false;
+}
+
+function objKeys(obj) {
+var arr = [];
+for (var k in obj) { if (obj.hasOwnProperty(k)) arr.push(k); }
+return arr;
+}
+
+function build() {
+var role   = gv(‘f-role’);
+var task   = gv(‘f-task’);
+var toneC  = gv(‘f-tone-custom’);
+var aud    = gv(‘f-audience’);
+var ctx    = gv(‘f-context’);
+var fmtC   = gv(‘f-format-custom’);
+var lenC   = gv(‘f-length-custom’);
+var ref    = gv(‘f-reference’);
+var rulesC = gv(‘f-rules-custom’);
+var useStg = gc(‘use-stages’);
+
+if (!task) {
+document.getElementById(‘xml-box’).innerHTML =
+‘<span class="xc"><!– Fill in the Task field (field 2) to generate your prompt. –></span>’;
+return;
+}
+
+var toneArr   = objKeys(sets.tone);   if (toneC) toneArr.push(toneC);
+var fmtArr    = objKeys(sets.format); if (fmtC)  fmtArr.push(fmtC);
+var lenArr    = objKeys(sets.length); if (lenC)  lenArr.push(lenC);
+
+var rules = [];
+if (gc(‘r1’)) rules.push(‘Do not make up information - only use what is provided.’);
+if (gc(‘r2’)) rules.push(‘Do not include personal opinions or commentary.’);
+if (gc(‘r3’)) rules.push(‘Flag anything uncertain with “[Needs verification]”.’);
+if (gc(‘r4’)) rules.push(‘Avoid jargon and acronyms unless defined.’);
+if (gc(‘r5’)) rules.push(‘Do not reproduce large sections of source text verbatim.’);
+if (gc(‘r6’)) rules.push(‘Ask me a clarifying question before starting if anything is unclear.’);
+var rcLines = rulesC.split(’\n’);
+for (var i = 0; i < rcLines.length; i++) {
+var r = rcLines[i].trim();
+if (r) rules.push(r);
+}
+
+var L = [];
+L.push(xt(’<prompt>’));
+
+if (role) {
+L.push(’’);
+L.push(xt(’<role>’));
+L.push(’  ’ + xe(role));
+L.push(xt(’</role>’));
+}
+
+L.push(’’);
+L.push(xt(’<task>’));
+var taskLines = task.split(’\n’);
+for (var i = 0; i < taskLines.length; i++) L.push(’  ’ + xe(taskLines[i]));
+L.push(xt(’</task>’));
+
+if (toneArr.length) {
+L.push(’’); L.push(xt(’<tone>’));
+for (var i = 0; i < toneArr.length; i++) L.push(’  - ’ + xe(toneArr[i]));
+L.push(xt(’</tone>’));
+}
+
+if (aud) {
+L.push(’’); L.push(xt(’<audience>’));
+L.push(’  ’ + xe(aud));
+L.push(xt(’</audience>’));
+}
+
+if (ctx) {
+L.push(’’); L.push(xt(’<context>’));
+var ctxLines = ctx.split(’\n’);
+for (var i = 0; i < ctxLines.length; i++) L.push(’  ’ + xe(ctxLines[i]));
+L.push(xt(’</context>’));
+}
+
+if (fmtArr.length || lenArr.length) {
+L.push(’’); L.push(xt(’<output_format>’));
+for (var i = 0; i < fmtArr.length; i++) L.push(’  - ’ + xe(fmtArr[i]));
+for (var i = 0; i < lenArr.length; i++) L.push(’  - ’ + xe(lenArr[i]));
+L.push(xt(’</output_format>’));
 }
 
 if (rules.length) {
-  lines.push(`\n  <rules>`);
-  rules.forEach(r => lines.push(`    - ${esc(r)}`));
-  lines.push(`  </rules>`);
+L.push(’’); L.push(xt(’<rules>’));
+for (var i = 0; i < rules.length; i++) L.push(’  - ’ + xe(rules[i]));
+L.push(xt(’</rules>’));
 }
 
-if (useStages && stages.some(s => s.text.trim())) {
-  lines.push(`\n  <stages>`);
-  lines.push(`    <!-- Deliver each stage separately. Stop after each and wait for me to say "continue". -->`);
-  stages.filter(s => s.text.trim()).forEach((s, i) => {
-    lines.push(`    <stage number="${i+1}">`);
-    lines.push(`      ${esc(s.text.trim())}`);
-    lines.push(`    </stage>`);
-  });
-  lines.push(`  </stages>`);
+if (useStg) {
+var hasStages = false;
+for (var i = 0; i < stages.length; i++) { if (stages[i].text.trim()) { hasStages = true; break; } }
+if (hasStages) {
+L.push(’’); L.push(xt(’<stages>’));
+L.push(’  <span class="xc"><!– Deliver each stage separately. Stop after each and wait for me to say “continue”. –></span>’);
+var n = 0;
+for (var i = 0; i < stages.length; i++) {
+if (!stages[i].text.trim()) continue;
+n++;
+L.push(’  <span class="xt"><stage</span> <span class="xa">number=”’ + n + ‘”</span><span class="xt">></span>’);
+L.push(’    ’ + xe(stages[i].text.trim()));
+L.push(’  ’ + xt(’</stage>’));
+}
+L.push(xt(’</stages>’));
+}
 }
 
-if (reference) {
-  lines.push(`\n  <reference>`);
-  reference.split('\n').forEach(l => lines.push(`    ${esc(l)}`));
-  lines.push(`  </reference>`);
+if (ref) {
+L.push(’’); L.push(xt(’<reference>’));
+var refLines = ref.split(’\n’);
+for (var i = 0; i < refLines.length; i++) L.push(’  ’ + xe(refLines[i]));
+L.push(xt(’</reference>’));
 }
 
-lines.push(`\n</prompt>`);
-return lines.join('\n');
-```
+L.push(’’);
+L.push(xt(’</prompt>’));
 
+document.getElementById(‘xml-box’).innerHTML = L.join(’\n’);
 }
 
-function update() {
-const xml = buildXML();
-const el = document.getElementById(‘xml-output’);
-// Simple syntax highlight
-const highlighted = xml
-.replace(/(</?[a-zA-Z_][a-zA-Z0-9_]*(?:\s[^&]*)?)(>)/g, ‘<span class="xml-tag">$1$2</span>’)
-.replace(/(<!–.*?–>)/g, ‘<span class="xml-comment">$1</span>’)
-.replace(/(number=”[^”]*”)/g, ‘<span class="xml-attr">$1</span>’);
-el.innerHTML = highlighted;
+function xt(s) {
+return s.replace(/^(</?[a-zA-Z_][a-zA-Z0-9_]*)(>)$/, ‘<span class="xt">$1$2</span>’);
 }
 
-function copyOutput() {
-const xml = buildXML();
-navigator.clipboard.writeText(xml).then(() => {
-const btn = document.getElementById(‘copy-btn’);
-btn.textContent = ‘✓ Copied!’;
-btn.classList.add(‘copied’);
-setTimeout(() => { btn.textContent = ‘Copy to Clipboard’; btn.classList.remove(‘copied’); }, 2000);
-});
+function doCopy() {
+var text = document.getElementById(‘xml-box’).innerText;
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(text).then(function() { flashCopy(); });
+} else {
+var ta = document.createElement(‘textarea’);
+ta.value = text;
+ta.style.position = ‘fixed’;
+ta.style.opacity = ‘0’;
+document.body.appendChild(ta);
+ta.select();
+document.execCommand(‘copy’);
+document.body.removeChild(ta);
+flashCopy();
+}
 }
 
-// Init
-update();
+function flashCopy() {
+var btn = document.getElementById(‘copy-btn’);
+btn.textContent = ‘Copied!’;
+btn.classList.add(‘ok’);
+setTimeout(function() {
+btn.textContent = ‘Copy to Clipboard’;
+btn.classList.remove(‘ok’);
+}, 2000);
+}
+
+build();
 </script>
 
 </body>
